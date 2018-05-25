@@ -1,5 +1,4 @@
 import { INode, IEdge, IGraph, NodeId } from "./IGraph"
-import _ from "lodash"
 
 export default class Graph implements IGraph {
   nodes: INode[] = []
@@ -9,28 +8,6 @@ export default class Graph implements IGraph {
     if (graph !== undefined) {
       this.nodes = graph.nodes
       this.edges = graph.edges
-    }
-  }
-
-  getEdgesWithNode(id: NodeId): IEdge[] {
-    return this.edges.filter(e => e.from === id || e.to === id)
-  }
-
-  getNeighborNodes(id: NodeId): NodeId[] {
-    return this.getEdgesWithNode(id).map(e => {
-      return e.from === id ? e.to : e.from
-    })
-  }
-
-  getNodesAtHops(from: NodeId, hops: number, memo?: NodeId[]): NodeId[] {
-    const mem: NodeId[] = memo === undefined ? [from] : memo
-    const neighbors = this.getNeighborNodes(from).filter(n => !mem.includes(n))
-    neighbors.forEach(n => mem.push(n))
-    const nextHops = hops - 1
-    if (nextHops === 0) {
-      return neighbors
-    } else {
-      return _.flatten(neighbors.map(n => this.getNodesAtHops(n, nextHops, mem)))
     }
   }
 
@@ -54,16 +31,5 @@ export default class Graph implements IGraph {
   nodeColor(id: NodeId, color: string = "red"): Graph {
     this.updateNode(id, { color })
     return this
-  }
-
-  static merge(...graphs: IGraph[]): Graph {
-    function merge2(graphA: Graph, graphB: Graph): IGraph {
-      return {
-        nodes: [...graphA.nodes, ...graphB.nodes],
-        edges: [...graphA.edges, ...graphB.edges]
-      }
-    }
-    const g = graphs.reduce(merge2)
-    return new Graph(g)
   }
 }

@@ -1,5 +1,5 @@
 import { IGraph, IEdge, INode, NodeId } from "./IGraph"
-import Graph from "./Graph"
+import _ from "lodash"
 
 export function assemble1DGraphs(...graphs: IGraph[]) {
   function assemble2(nodesA: INode[], nodesB: INode[]): IEdge[] {
@@ -15,65 +15,43 @@ export function assemble1DGraphs(...graphs: IGraph[]) {
     }
     return edges
   }
-  let graph = new Graph(graphs[0])
+  let graph = graphs[0]
   for (let i = 0; i < graphs.length - 1; i++) {
     const graphA = graphs[i]
     const graphB = graphs[i + 1]
-    graph = Graph.merge(graph, graphB)
+    graph = merge(graph, graphB)
     const edges = assemble2(graphA.nodes, graphB.nodes)
     graph.edges = [...graph.edges, ...edges]
   }
   return graph
 }
 
-// for Dijkstra
-interface DNode extends INode {
-  cost: number
-  done: boolean
-  to: NodeId[]
+export function getEdgesWithNode(graph: IGraph, id: NodeId): IEdge[] {
+  return graph.edges.filter(e => e.from === id || e.to === id)
 }
 
-// Dijkstra's algorithm
-export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): IGraph {
-  const nodes: DNode[] = graph.nodes.map(n => {
-    const toNode = graph.edges.filter(e => e.from === n.id || e.to === n.id).map(e => (e.from === n.id ? e.to : e.from))
+export function getNeighborNodes(graph: IGraph, id: NodeId): NodeId[] {
+  return getEdgesWithNode(graph, id).map(e => e.from === id ? e.to : e.from)
+}
+
+export function getNodesAtHops(graph: IGraph, from: NodeId, hops: number, memo?: NodeId[]): NodeId[] {
+  const mem: NodeId[] = memo === undefined ? [from] : memo
+  const neighbors = getNeighborNodes(graph, from).filter(n => !mem.includes(n))
+  neighbors.forEach(n => mem.push(n))
+  const nextHops = hops - 1
+  if (nextHops === 0) {
+    return neighbors
+  } else {
+    return _.flatten(neighbors.map(n => getNodesAtHops(graph, n, nextHops, mem)))
+  }
+}
+
+export function merge(...graphs: IGraph[]): IGraph {
+  function merge2(graphA: IGraph, graphB: IGraph): IGraph {
     return {
-      ...n,
-      done: false,
-      cost: n.id === from ? 0 : -1, // スタートノードのコストは0
-      to: toNode
-    }
-  })
-  while (true) {
-    // 確定ノードを探す
-    let doneNode: DNode | undefined
-    for (const node of nodes) {
-      if (node.done || node.cost < 0) {
-        continue
-      }
-      if (doneNode === undefined || node.cost < doneNode.cost) {
-        doneNode = node
-      }
-    }
-
-    // 確定ノードがなくなれば終了
-    if (doneNode === undefined) {
-      break
-    }
-
-    // 確定フラグを立てる
-    doneNode.done = true
-
-    // 接続先ノードの情報を更新する
-    for (const toNode of doneNode.to) {
-      const cost = doneNode.cost + 1 // 各エッジの重みは全て 1
-      if (nodes[toNode].cost < 0 || cost < nodes[toNode].cost) {
-        nodes[toNode].cost = cost
-      }
+      nodes: [...graphA.nodes, ...graphB.nodes],
+      edges: [...graphA.edges, ...graphB.edges]
     }
   }
-  return {
-    nodes: [],
-    edges: []
-  }
+  return graphs.reduce(merge2)
 }
