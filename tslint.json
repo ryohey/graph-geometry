@@ -9,6 +9,7 @@
     "object-literal-sort-keys": false,
     "member-access": false,
     "member-ordering": false,
-    "interface-name": false
+    "interface-name": false,
+    "no-console": false
   }
 }

@@ -30,14 +30,10 @@ class App extends React.Component {
       },
       physics: {
         stabilization: false
-      },
-      nodes: {
-        shapeProperties: {
-          interpolation: false // 'true' for intensive zooming
-        }
       }
     }
     const network = new vis.Network(document.querySelector("#graph") as HTMLElement, graph, options)
+    console.log(network)
   }
 
   public render() {
