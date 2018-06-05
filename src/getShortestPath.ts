@@ -1,21 +1,22 @@
 import { INode, NodeId, IGraph } from "./IGraph"
 
-// for Dijkstra
 interface DNode extends INode {
   cost: number
   done: boolean
   to: NodeId[]
+  prev: DNode|undefined
 }
 
 // Dijkstra's algorithm
-export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): IGraph {
+export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): NodeId[] {
   const nodes: DNode[] = graph.nodes.map(n => {
     const toNode = graph.edges.filter(e => e.from === n.id || e.to === n.id).map(e => (e.from === n.id ? e.to : e.from))
     return {
       ...n,
       done: false,
       cost: n.id === from ? 0 : -1, // スタートノードのコストは0
-      to: toNode
+      to: toNode,
+      prev: undefined
     }
   })
   while (true) {
@@ -25,7 +26,9 @@ export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): IGraph
       if (node.done || node.cost < 0) {
         continue
       }
-      if (doneNode === undefined || node.cost < doneNode.cost) {
+
+      if (doneNode === undefined || 
+          node.cost < doneNode.cost) {
         doneNode = node
       }
     }
@@ -40,14 +43,26 @@ export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): IGraph
 
     // 接続先ノードの情報を更新する
     for (const toNode of doneNode.to) {
+      const node = nodes.find(n => n.id === toNode) as DNode
       const cost = doneNode.cost + 1 // 各エッジの重みは全て 1
-      if (nodes[toNode].cost < 0 || cost < nodes[toNode].cost) {
-        nodes[toNode].cost = cost
+      if (node.cost < 0 || cost < node.cost) {
+        node.cost = cost
+        node.prev = doneNode
       }
     }
   }
-  return {
-    nodes: [],
-    edges: []
+
+  const path: NodeId[] = []
+  let current = nodes.find(n => n.id === to) as DNode
+
+  while (true) {
+    const next = current.prev
+    if (!next) {
+      break
+    }
+    path.push(next.id)
+    current = next
   }
+
+  return path
 }
