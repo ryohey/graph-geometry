@@ -4,19 +4,28 @@ import { create2DGridGraph } from "./GraphFactory"
 // import { getNodesAtHops } from "./GraphHelper"
 import Graph from "./Graph"
 import { getShortestPath } from "./getShortestPath"
+import { getPathVia } from "./getPathVia"
+import _ from "lodash"
 
 import "./App.css"
 
 class App extends React.Component {
   componentDidMount() {
     const graph = new Graph(create2DGridGraph(10, 10))
-    const startId = graph.nodes[6].id
-    const goalId = graph.nodes[35].id
-    const path = getShortestPath(graph, startId, goalId)
+
+    const randomId = () => 
+      graph.nodes[_.random(0, graph.nodes.length - 1)].id
+
+    const startId = randomId()
+    const midId = randomId()
+    const goalId = randomId()
+
+    const path = getPathVia(graph, [startId, midId, goalId], getShortestPath)
 
     path.forEach(id => graph.nodeColor(id, "green"))
 
     graph.nodeColor(startId, "red")
+    graph.nodeColor(midId, "yellow")
     graph.nodeColor(goalId, "red")
     // const centerId = graph.nodes[20 * (20 + 1) / 2].id
     // getNodesAtHops(graph, centerId, 1).forEach(n => graph.nodeColor(n, "gray"))

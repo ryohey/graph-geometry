@@ -52,8 +52,8 @@ export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): NodeId
     }
   }
 
-  const path: NodeId[] = []
   let current = nodes.find(n => n.id === to) as DNode
+  const path: NodeId[] = [to]
 
   while (true) {
     const next = current.prev
