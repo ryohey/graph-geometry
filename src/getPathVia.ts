@@ -14,5 +14,7 @@ export function getPathVia(graph: IGraph, nodeIds: NodeId[], getShortestPath: Sh
     path.push(...subpath.slice(0, -1)) // 重複するので最後を取り除いて追加する
   })
 
+  path.push(nodeIds[nodeIds.length - 1])
+
   return path
 }

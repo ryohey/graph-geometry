@@ -22,7 +22,7 @@ class App extends React.Component {
 
     const path = getPathVia(graph, [startId, midId, goalId], getShortestPath)
 
-    path.forEach(id => graph.nodeColor(id, "green"))
+    path.forEach((id, n) => graph.nodeColor(id, "green").nodeLabel(id, `${n}`))
 
     graph.nodeColor(startId, "red")
     graph.nodeColor(midId, "yellow")
@@ -43,6 +43,15 @@ class App extends React.Component {
     // )
 
     const options: vis.Options = {
+      nodes: {
+        shape: 'dot',
+        size: 20,
+        font: {
+            size: 22,
+            color: '#ffffff'
+        },
+        borderWidth: 2
+      },
       layout: {
         improvedLayout: true
       },

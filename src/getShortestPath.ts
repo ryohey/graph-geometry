@@ -60,7 +60,7 @@ export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): NodeId
     if (!next) {
       break
     }
-    path.push(next.id)
+    path.unshift(next.id)
     current = next
   }
 
