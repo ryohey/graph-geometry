@@ -32,4 +32,9 @@ export default class Graph implements IGraph {
     this.updateNode(id, { color })
     return this
   }
+
+  nodeLabel(id: NodeId, label: string): Graph {
+    this.updateNode(id, { label })
+    return this
+  }
 }
