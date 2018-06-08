@@ -1,11 +1,14 @@
 import * as React from "react"
 import vis from "vis"
-import { create2DGridGraph } from "./GraphFactory"
-// import { getNodesAtHops } from "./GraphHelper"
-import Graph from "./Graph"
-import { getShortestPath } from "./getShortestPath"
-import { getPathVia } from "./getPathVia"
 import _ from "lodash"
+import { create2DGridGraph } from "./GraphFactory"
+import { getNodesAtHops } from "./GraphHelper"
+import Graph from "./Graph"
+import Geometry from "./Geometry"
+import { getDijkstraDistance } from "./getShortestPath"
+const { sortNearestNodes } = Geometry(getDijkstraDistance)
+// import { getShortestPath } from "./getShortestPath"
+// import { getPathVia } from "./getPathVia"
 
 import "./App.css"
 
@@ -13,35 +16,20 @@ class App extends React.Component {
   componentDidMount() {
     const graph = new Graph(create2DGridGraph(10, 10))
 
-    const randomId = () => 
-      graph.nodes[_.random(0, graph.nodes.length - 1)].id
+    const centerId = graph.nodes[graph.nodes.length / 2 - 5].id
 
-    const startId = randomId()
-    const midId = randomId()
-    const goalId = randomId()
+    const circleNodes = getNodesAtHops(graph, centerId, 3)
+    const startId = circleNodes[0]
+    const viaIds = _.without(circleNodes, startId)
+    const nodes = sortNearestNodes(graph, startId, viaIds, startId)
 
-    const path = getPathVia(graph, [startId, midId, goalId], getShortestPath)
-
-    path.forEach((id, n) => graph.nodeColor(id, "green").nodeLabel(id, `${n}`))
-
-    graph.nodeColor(startId, "red")
-    graph.nodeColor(midId, "yellow")
-    graph.nodeColor(goalId, "red")
-    // const centerId = graph.nodes[20 * (20 + 1) / 2].id
-    // getNodesAtHops(graph, centerId, 1).forEach(n => graph.nodeColor(n, "gray"))
-    // getNodesAtHops(graph, centerId, 2).forEach(n => graph.nodeColor(n, "blue"))
-    // getNodesAtHops(graph, centerId, 3).forEach(n => graph.nodeColor(n, "green"))
-    // getNodesAtHops(graph, centerId, 4).forEach(n => graph.nodeColor(n, "yellow"))
-    // getNodesAtHops(graph, centerId, 5).forEach(n => graph.nodeColor(n, "red"))
-
-    // const graph = assemble1DGraphs(
-    //   createLineGraph(13),
-    //   createLineGraph(13),
-    //   createLineGraph(13),
-    //   createLineGraph(13),
-    //   createLineGraph(13)
-    // )
-
+    // const path = getPathVia(graph, nodes, getShortestPath)
+    nodes.forEach((id, n) => graph.nodeLabel(id, `${n}`))
+    // path.forEach((id, n) => graph.nodeColor(id, "green").nodeLabel(id, `${n}`))
+    
+    graph.nodeColor(centerId, "red")
+    nodes.forEach(n => graph.nodeColor(n, "yellow"))
+    
     const options: vis.Options = {
       nodes: {
         shape: 'dot',

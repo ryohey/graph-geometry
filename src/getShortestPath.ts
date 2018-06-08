@@ -1,4 +1,7 @@
 import { INode, NodeId, IGraph } from "./IGraph"
+import { Distance } from "./Geometry"
+
+export type ShortestPathFunc = (graph: IGraph, from: NodeId, to: NodeId) => NodeId[]
 
 interface DNode extends INode {
   cost: number
@@ -65,4 +68,8 @@ export function getShortestPath(graph: IGraph, from: NodeId, to: NodeId): NodeId
   }
 
   return path
+}
+
+export const getDijkstraDistance: Distance = (graph: IGraph, from: NodeId, to: NodeId): number => {
+  return getShortestPath(graph, from, to).length
 }

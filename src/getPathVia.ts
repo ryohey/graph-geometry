@@ -1,7 +1,7 @@
 import { NodeId, IGraph } from "./IGraph"
+import { ShortestPathFunc } from "./getShortestPath"
 
-type ShortestPathFunc = (graph: IGraph, from: NodeId, to: NodeId) => NodeId[]
-
+// 与えられた中間点を順番通りに最短距離で通る経路を計算する
 export function getPathVia(graph: IGraph, nodeIds: NodeId[], getShortestPath: ShortestPathFunc): NodeId[] {
   const path: NodeId[] = []
 
