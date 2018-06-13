@@ -1,8 +1,6 @@
 import { INode, NodeId, IGraph } from "./IGraph"
 import { Distance } from "./Geometry"
 
-export type ShortestPathFunc = (graph: IGraph, from: NodeId, to: NodeId) => NodeId[]
-
 interface DNode extends INode {
   cost: number
   done: boolean
