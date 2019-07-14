@@ -5,12 +5,13 @@ import { create2DGridGraph } from "./GraphFactory"
 import { getNodesAtHops } from "./GraphHelper"
 import Graph from "./Graph"
 import Geometry from "./Geometry"
-import { getDijkstraDistance } from "./getShortestPath"
-const { sortNearestNodes } = Geometry(getDijkstraDistance)
+import { getDijkstraDistance } from "./Dijkstra"
 // import { getShortestPath } from "./getShortestPath"
 // import { getPathVia } from "./getPathVia"
 
 import "./App.css"
+
+const { sortNearestNodes } = Geometry(getDijkstraDistance)
 
 class App extends React.Component {
   componentDidMount() {
